@@ -1,13 +1,20 @@
 const { validationResult } = require("express-validator");
 
+// models
+const Note = require("../models/note");
+
 exports.getNotes = (req, res, next) => {
-  const notes = [
-    {
-      title: "first note",
-      content: "First content",
-    },
-  ];
-  res.json(notes);
+  Note.find()
+    .sort({ createdAt: -1 })
+    .then((notes) => {
+      res.status(200).json(notes);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(404).json({
+        message: "Something went wrong.",
+      });
+    });
 };
 
 exports.createNote = (req, res, next) => {
@@ -19,11 +26,50 @@ exports.createNote = (req, res, next) => {
       errorMessage: error.array(),
     });
   }
-  res.status(201).json({
-    message: "Note Created",
-    data: {
-      title,
-      content,
-    },
-  });
+
+  Note.create({
+    title,
+    content,
+  })
+    .then((_) => {
+      res.status(201).json({
+        message: "Note created.",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(404).json({
+        message: "Something went wrong.",
+      });
+    });
+};
+
+exports.getNote = (req, res, next) => {
+  const { id } = req.params;
+  Note.findById(id)
+    .then((note) => {
+      return res.status(200).json(note);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(404).json({
+        message: "Something went wrong.",
+      });
+    });
+};
+
+exports.deleteNote = (req, res, next) => {
+  const { id } = req.params;
+  Note.findByIdAndDelete(id)
+    .then((_) => {
+      return res.status(204).json({
+        message: "Note deleted",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(404).json({
+        message: "Something went wrong.",
+      });
+    });
 };
