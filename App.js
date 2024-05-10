@@ -8,6 +8,7 @@ const multer = require("multer");
 const path = require("path");
 
 const noteRoute = require("./routes/note");
+const authRoute = require("./routes/auth");
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use(
 app.use(cors());
 
 app.use(noteRoute);
+app.use(authRoute);
 
 mongoose
   .connect(process.env.MONGO_URL)
