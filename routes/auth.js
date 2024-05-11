@@ -4,6 +4,8 @@ const { body } = require("express-validator");
 
 const authController = require("../controllers/auth");
 
+const authMiddleware = require("../middlewares/is-auth");
+
 const User = require("../models/user");
 
 // POST /register
@@ -45,9 +47,7 @@ router.post(
 router.post(
   "/login",
   [
-    body("email")
-      .isEmail()
-      .withMessage("Please enter a valid email!"),
+    body("email").isEmail().withMessage("Please enter a valid email!"),
     body("password")
       .trim()
       .isLength({ min: 4 })
@@ -55,5 +55,8 @@ router.post(
   ],
   authController.login
 );
+
+// GET /status
+router.get("/status", authController.checkStatus);
 
 module.exports = router;
